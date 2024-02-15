@@ -1,0 +1,76 @@
+---
+admin_email: "you@your.domain"          # replace this with your admin email
+app_name: "collectiveaccess"
+#  cache_backend: "file"
+cache_backend: "redis"
+clean_urls: "0"
+default_locale: "en_US"
+google_maps_key: ""
+html_dir: "/var/www/html"
+html_app_dir: "{{ html_dir }}/ca"
+queue_enabled: "0"
+site: "your.domain"                     # replace this with your site name
+timezone: "America/New_York"
+mysql:
+  root_user: "root"
+  root_password: "{{ root_password }}"  # replace this with your root password
+  database: "ca"
+  user: "collective"
+  password: "{{ user_password }}"       # replace this with your user password
+  host: "localhost"
+  dump: ''
+  packages:
+    - "mysql"
+    - "mysql-server"
+    - "python3-PyMySQL"
+php:
+  packages:
+    - php
+    - php-cli
+    - php-common
+    - php-curl
+    - php-fileinfo
+    - php-gd
+    - php-gmagick
+    - php-mbstring
+    - php-mysqlnd
+    - php-opcache
+    - php-process
+    - php-pecl-redis5
+    - php-redis
+    - php-xml
+    - php-zip
+  version: "7.4"
+pawtucket:
+  dir: "{{ html_app_dir }}/pawtucket"
+  host: "localhost"
+  repo: "https://github.com/collectiveaccess/pawtucket2.git"
+  theme: "default"
+  version: "1.7.15"
+providence:
+  host: "localhost"
+  repo: "https://github.com/collectiveaccess/providence.git"
+  support_packages:
+    - "dcraw"
+    - "ffmpeg"
+    - "ghostscript"
+    - "git"
+    - "GraphicsMagick"
+    - "libreoffice"
+    - "mediainfo"
+    - "perl-Image-ExifTool"
+    - "poppler"
+    - "redis"
+  version: "1.7.17"
+repos:
+  epel8:
+    url: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm"
+    key: "https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-8"
+  remi8:
+    url: "https://rpms.remirepo.net/enterprise/remi-release-8.rpm"
+    key: "https://rpms.remirepo.net/enterprise/8/RPM-GPG-KEY-remi"
+  rpmfusion_free:
+    url: "https://download1.rpmfusion.org/free/el/rpmfusion-free-release-8.noarch.rpm"
+    key: "https://rpmfusion.org/keys?action=AttachFile&do=get&target=RPM-GPG-KEY-rpmfusion-free-el-8"
+
+...
