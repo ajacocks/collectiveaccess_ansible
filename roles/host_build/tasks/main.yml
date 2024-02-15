@@ -1,0 +1,40 @@
+---
+
+#- name: Get current hostname
+#  ansible.builtin.command: hostname
+#  register: current_hostname
+
+- name: Update host
+  ansible.builtin.dnf:
+    name: "*"
+    state: latest
+
+- name: Enable an RHSM repository
+  community.general.rhsm_repository:
+    name: "codeready-builder-for-rhel-8-{{ ansible_architecture }}-rpms"
+    state: enabled
+
+- name: Import a key from a url
+  ansible.builtin.rpm_key:
+    key: "{{ item }}"
+    state: present
+  loop:
+    - "{{ repos.epel8.key }}"
+    - "{{ repos.remi8.key }}"
+    - "{{ repos.rpmfusion_free.key }}"
+
+- name: Configure epel and remi repos
+  ansible.builtin.dnf:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - "{{ repos.epel8.url }}"
+    - "{{ repos.remi8.url }}"
+    - "{{ repos.rpmfusion_free.url }}"
+
+- name: Enable repositories
+  community.general.dnf_config_manager:
+    name: "remi"
+    state: enabled
+
+...

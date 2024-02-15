@@ -1,0 +1,60 @@
+---
+
+- name: Install and configure mysql
+  block:
+    - name: Install mysql-server packages
+      ansible.builtin.package:
+        name: "{{ mysql.packages }}"
+        state: present
+
+    - name: Start and enable mysql service
+      ansible.builtin.service:
+        name: mysqld
+        state: started
+        enabled: true
+
+    - name: Update root password for all root accounts
+      community.mysql.mysql_user:
+        name: "{{ mysql.root_user }}"
+        host: "{{ item }}"
+        check_implicit_admin: true
+        password: "{{ mysql.root_password }}"
+        login_user: "root"
+        login_password: "{{ mysql.root_password }}"
+        column_case_sensitive: false
+      loop:
+        - "{{ inventory_hostname }}"
+        - "127.0.0.1"
+        - "::1"
+        - "localhost"
+
+    - name: Create databases
+      community.mysql.mysql_db:
+        name: "{{ mysql.database }}"
+        state: present
+        login_user: "{{ mysql.root_user }}"
+        login_password: "{{ mysql.root_password }}"
+
+    - name: Ensure anonymous users are not in the database
+      community.mysql.mysql_user:
+        name: ''
+        host: "{{ item }}"
+        state: absent
+        login_user: "{{ mysql.root_user }}"
+        login_password: "{{ mysql.root_password }}"
+        column_case_sensitive: false
+      loop:
+        - "localhost"
+        - "{{ inventory_hostname }}"
+
+    - name: Create users
+      community.mysql.mysql_user:
+        name: "{{ mysql.user }}"
+        password: "{{ mysql.password }}"
+        priv: "{{ mysql.database }}.*:ALL"
+        state: present
+        login_user: "{{ mysql.root_user }}"
+        login_password: "{{ mysql.root_password }}"
+        column_case_sensitive: false
+
+...

@@ -1,0 +1,36 @@
+---
+
+- name: Install and configure httpd
+  block:
+    - name: Install httpd package
+      ansible.builtin.package:
+        name: "httpd"
+        state: present
+
+    - name: Set httpd to start automatically
+      ansible.builtin.service:
+        name: "httpd"
+        enabled: true
+        state: started
+
+    - name: Open http and https services in firewall
+      ansible.posix.firewalld:
+        service: "{{ item }}"
+        permanent: true
+        state: enabled
+        immediate: true
+      loop:
+        - http
+        - https
+
+    - name: Set necessary SELinux booleans to true
+      ansible.posix.seboolean:
+        name: "{{ item.boolean }}"
+        state: "{{ item.value }}"
+        persistent: true
+      loop:
+        - { boolean: httpd_unified, value: true }
+        - { boolean: httpd_can_network_connect_db, value: true }
+        - { boolean: httpd_can_network_redis, value: true }
+
+...

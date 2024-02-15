@@ -1,0 +1,38 @@
+---
+
+- name: Install and configure Collective Access Pawtucket
+  block:
+
+    - name: Checkout git release {{ pawtucket.version }} of Collective Access Pawtucket
+      ansible.builtin.git:
+        repo: "{{ pawtucket.repo }}"
+        dest: "{{ pawtucket.dir }}"
+        version: "{{ pawtucket.version }}"
+
+    - name: Template {{ pawtucket.dir }}/setup.php-dist and write to {{ pawtucket.dir }}/setup.php
+      ansible.builtin.template:
+        src: setup.php.j2
+        dest: "{{ pawtucket.dir }}/setup.php"
+        mode: '0644'
+        owner: 'root'
+        group: 'root'
+
+    - name: Change ownership and permissions on directories under {{ pawtucket.dir }} to apache:apache and 0755
+      ansible.builtin.file:
+        path: "{{ pawtucket.dir }}/{{ item }}"
+        owner: apache
+        group: apache
+        mode: '0755'
+        recurse: true
+        state: directory
+      loop:
+        - app/tmp
+        - vendor 
+
+    - name: Create a symbolic link from {{ html_app_dir }}/media to {{ pawtucket.dir }}
+      ansible.builtin.file:
+        path: "{{ pawtucket.dir }}/media"
+        src: "{{ html_app_dir }}/media"
+        state: link
+
+...

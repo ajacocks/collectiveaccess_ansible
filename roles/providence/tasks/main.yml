@@ -1,0 +1,45 @@
+---
+
+- name: Install and configure Collective Access Providence
+  block:
+
+    - name: Install packages in support_packages
+      ansible.builtin.package:
+        name: "{{ providence.support_packages }}"
+        state: present
+
+    - name: Start and enable redis service
+      ansible.builtin.service:
+        name: redis
+        state: started
+        enabled: true
+
+    - name: Checkout git release {{ providence.version }} of Collective Access Providence
+      ansible.builtin.git:
+        repo: "{{ providence.repo }}"
+        dest: "{{ html_app_dir }}"
+        version: "{{ providence.version }}"
+
+    - name: Template {{ html_app_dir }}/setup.php-dist and write to {{ html_app_dir }}/setup.php
+      ansible.builtin.template:
+        src: setup.php.j2
+        dest: "{{ html_app_dir }}/setup.php"
+        mode: '0644'
+        owner: 'root'
+        group: 'root'
+
+    - name: Change ownership and permissions on directories under {{ html_app_dir }} to apache:apache and 0755
+      ansible.builtin.file:
+        path: "{{ html_app_dir }}/{{ item }}"
+        owner: apache
+        group: apache
+        mode: '0755'
+        state: directory
+        recurse: true
+      loop:
+        - app/tmp
+        - app/log
+        - media
+        - vendor
+
+...

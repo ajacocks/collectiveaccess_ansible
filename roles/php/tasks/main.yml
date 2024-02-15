@@ -1,0 +1,29 @@
+---
+
+- name: Install and configure php
+  block:
+    - name: Enable module remi for php {{ php.version }}
+      ansible.builtin.package:
+        name: "@php:remi-{{ php.version }}"
+        state: present
+
+    - name: Install php {{ php.version }}
+      ansible.builtin.package:
+        name: "{{ php.packages }}"
+        state: present
+
+    - name: Increase php memory limit in php.ini
+      ansible.builtin.lineinfile:
+        path: /etc/php.ini
+        regexp: ^memory_limit =
+        line: memory_limit = 512M
+      notify: Apache_restart
+
+    - name: Start and enable php-fpm service
+      ansible.builtin.service:
+        name: "php-fpm"
+        state: started
+        enabled: true
+    
+
+...

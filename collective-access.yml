@@ -1,0 +1,15 @@
+---
+
+- name: Build collective access
+  hosts: ca
+  become: true
+
+  roles:
+    - host_build
+    - httpd
+    - php
+    - mysql
+    - providence
+    - pawtucket
+
+...

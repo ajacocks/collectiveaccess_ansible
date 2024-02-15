@@ -1,0 +1,8 @@
+---
+
+- name: Apache_restart
+  ansible.builtin.service:
+    name: httpd
+    state: restarted
+
+...
